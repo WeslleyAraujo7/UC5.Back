@@ -64,13 +64,52 @@ app.patch("/produtos/atualizar/:id", (requisicao, resposta) => {
 });
 
 // listar um produto pelo id
-app.get("/produtos/listar/:id", (requisicao, resposta) => {});
+app.get("/produtos/listar/:id", (requisicao, resposta) => {
+  try {
+    const id = parseInt(requisicao.params.id);
+    const produto = produtos.find(produto => produto.id === id);
+    if (!produto) {
+      return resposta.status(404).json({ mensagem: "Produto não encontrado!" });
+    }
+    resposta.status(200).json(produto);
+  } catch (error) {
+    resposta.status(500).json({
+      mensagem: "Erro interno do servidor. Por favor tente mais tarde!",
+      erro: error.message
+    });
+  }
+});
 
 // deletar todos os produtos
-app.delete("/produtos/deletar", (requisicao, resposta) => {});
+app.delete("/produtos/deletar", (requisicao, resposta) => {
+  try {
+    produtos.length = 0; // Limpa o array de produtos
+    resposta.status(200).json({ mensagem: "Todos os produtos foram deletados com sucesso!" });
+  } catch (error) {
+    resposta.status(500).json({
+      mensagem: "Erro interno do servidor. Por favor tente mais tarde!",
+      erro: error.message
+    });
+  }
+});
 
 // deletar produto por id
-app.delete("/produtos/deletar/:id", (requisicao, resposta) => {});
+app.delete("/produtos/deletar/:id", (requisicao, resposta) => {
+  try {
+    const id = parseInt(requisicao.params.id);
+    const index = produtos.findIndex(produto => produto.id === id);
+    if (index === -1) {
+      return resposta.status(404).json({ mensagem: "Produto não encontrado!" });
+    }
+    produtos.splice(index, 1); // Remove o produto do array
+    resposta.status(200).json({ mensagem: "Produto deletado com sucesso!" });
+  } catch (error) {
+    resposta.status(500).json({
+      mensagem: "Erro interno do servidor. Por favor tente mais tarde!",
+      erro: error.message
+    });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
